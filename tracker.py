@@ -12,15 +12,15 @@ user = os.environ.get("OPENSKY_USER")
 password = os.environ.get("OPENSKY_PASS")
 
 if not all([url, key, user, password]):
-    print("❌ ERROR: Missing secrets. Check GitHub Actions Secrets.")
+    print("❌ ERROR: Missing secrets. Check GitHub Actions Secrets.", flush=True)
     sys.exit(1)
 
-print("🔗 Step 1: Connecting to Supabase...")
+print("🔗 Step 1: Connecting to Supabase...", flush=True)
 supabase = create_client(url, key)
 HEX_CODE = "a12711" 
 
 def check_flight():
-    print(f"📡 Step 2: Requesting data for {HEX_CODE} (30s timeout)...")
+    print(f"📡 Step 2: Requesting data for {HEX_CODE} (30s timeout)...", flush=True)
     
     state_data = None
     try:
@@ -35,7 +35,7 @@ def check_flight():
             if data.get('states'):
                 state_data = data['states'][0]
     except Exception as e:
-        print(f"⌛ Step 4: Request failed: {e}")
+        print(f"⌛ Step 4: Request failed: {e}", flush=True)
 
     # Check for active flight
     active_flight = supabase.table("flight_history").select("*").is_("end_time", "null").execute()
@@ -56,7 +56,7 @@ def check_flight():
         lat, lon = state_data[6], state_data[5]
 
         if not is_on_ground and not has_active_flight:
-            print(f"🚀 ACTION: Takeoff! Callsign: {db_callsign}")
+            print(f"🚀 ACTION: Takeoff! Callsign: {db_callsign}", flush=True)
             supabase.table("flight_history").insert({
                 "icao_address": HEX_CODE,
                 "callsign": db_callsign,
@@ -68,17 +68,17 @@ def check_flight():
             }).execute()
         
         elif not is_on_ground and has_active_flight:
-            print(f"✅ ACTION: Cruising ({db_callsign}). Saving breadcrumb.")
+            print(f"✅ ACTION: Cruising ({db_callsign}). Saving breadcrumb.", flush=True)
             flight_id = active_flight.data[0]['id']
             supabase.table("flight_history").update({
-                "callsign": db_callsign, # This won't overwrite with null anymore
+                "callsign": db_callsign,
                 "last_seen": "now()",
                 "last_lat": lat,
                 "last_lon": lon
             }).eq("id", flight_id).execute()
 
         elif is_on_ground and has_active_flight:
-            print(f"🛬 ACTION: Landing confirmed for {db_callsign}. Closing record.")
+            print(f"🛬 ACTION: Landing confirmed for {db_callsign}. Closing record.", flush=True)
             flight_id = active_flight.data[0]['id']
             supabase.table("flight_history").update({
                 "end_time": "now()",
@@ -86,7 +86,17 @@ def check_flight():
             }).eq("id", flight_id).execute()
     
     else:
-        if signal_gap > timedelta(minutes=30):
+        # PLANE IS OFFLINE
+        if has_active_flight:
+            # Calculate the time gap
+            last_seen_str = active_flight.data[0].get('last_seen') or active_flight.data[0]['start_time']
+            last_seen_dt = datetime.fromisoformat(last_seen_str.replace('Z', '+00:00'))
+            signal_gap = datetime.now(timezone.utc) - last_seen_dt
+            gap_minutes = signal_gap.total_seconds() / 60
+            
+            print(f"☁️ GAP CHECK: Signal lost. Time since last contact: {gap_minutes:.1f} minutes.", flush=True)
+
+            if signal_gap > timedelta(minutes=30):
                 # 1. Define it first
                 flight_id = active_flight.data[0]['id'] 
                 

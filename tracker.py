@@ -108,7 +108,7 @@ def check_flight():
                 
                 supabase.table("flight_history").update({
                     "end_time": "now()",
-                    "destination_airport": f"{old_lat}, {old_lon} (Last Seen)"
+                    "destination_airport": f"{old_lat}, {old_lon}"
                 }).eq("id", flight_id).execute()
                 
                 print("🛑 Safety-close complete.", flush=True)

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { aircraftIcon } from "@/lib/map-utils";
 import { AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AircraftState {
   lat: number;
@@ -13,6 +14,8 @@ interface AircraftState {
   squawk: string | null;
   onGround: boolean;
 }
+
+const REFRESH_SECONDS = 60;
 
 function Recenter({ lat, lon }: { lat: number; lon: number }) {
   const map = useMap();
@@ -26,19 +29,20 @@ export function LiveMap() {
   const [state, setState] = useState<AircraftState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [countdown, setCountdown] = useState(REFRESH_SECONDS);
+  const loadRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     let cancelled = false;
+
     async function load() {
       try {
-        // OpenSky Network public API. icao24 must be lowercase hex.
-        const icao = "a12711";
-        const res = await fetch(
-          `https://opensky-network.org/api/states/all?icao24=${icao}`
+        const { data, error: fnError } = await supabase.functions.invoke(
+          "opensky-proxy"
         );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        const s = json.states?.[0];
+        if (fnError) throw fnError;
+
+        const s = data?.state as AircraftState | null;
         if (!s) {
           // Fallback simulated position so UI still demonstrates behavior
           if (!cancelled)
@@ -52,31 +56,36 @@ export function LiveMap() {
               squawk: Math.random() > 0.85 ? "7700" : "1200",
               onGround: false,
             });
-        } else {
-          if (!cancelled)
-            setState({
-              callsign: (s[1] || "A12711").trim(),
-              lon: s[5],
-              lat: s[6],
-              altitude: s[7] ?? 0,
-              velocity: s[9] ?? 0,
-              heading: s[10] ?? 0,
-              squawk: s[14],
-              onGround: !!s[8],
-            });
+        } else if (!cancelled) {
+          setState(s);
         }
-        setError(null);
+        if (!cancelled) setError(null);
       } catch (e) {
         if (!cancelled) setError((e as Error).message);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setCountdown(REFRESH_SECONDS);
+        }
       }
     }
+
+    loadRef.current = load;
     load();
-    const id = setInterval(load, 15000);
+
+    const tick = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          loadRef.current();
+          return REFRESH_SECONDS;
+        }
+        return c - 1;
+      });
+    }, 1000);
+
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearInterval(tick);
     };
   }, []);
 
@@ -92,7 +101,12 @@ export function LiveMap() {
       )}
 
       <div className="absolute top-4 left-4 z-[1000] bg-card border border-border px-4 py-3 text-xs space-y-1 shadow-md min-w-[220px]">
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Telemetry</div>
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Telemetry</div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">
+            {countdown}s
+          </div>
+        </div>
         {loading && !state && <div>Acquiring signal…</div>}
         {error && <div className="text-destructive">{error}</div>}
         {state && (

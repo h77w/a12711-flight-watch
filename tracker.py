@@ -86,22 +86,21 @@ def check_flight():
             }).eq("id", flight_id).execute()
     
     else:
-        if has_active_flight:
-            last_seen_str = active_flight.data[0].get('last_seen') or active_flight.data[0]['start_time']
-            last_seen_dt = datetime.fromisoformat(last_seen_str.replace('Z', '+00:00'))
-            signal_gap = datetime.now(timezone.utc) - last_seen_dt
-            gap_minutes = signal_gap.total_seconds() / 60
-            
-            print(f"☁️ GAP CHECK: Signal lost. Time since last contact: {gap_minutes:.1f} minutes.", flush=True)
-
-            if signal_gap > timedelta(minutes=30):
+        if signal_gap > timedelta(minutes=30):
+                # 1. Define it first
+                flight_id = active_flight.data[0]['id'] 
+                
+                # 2. Then print it
                 print(f"🏁 ACTION: Gap exceeded 30m. Auto-closing flight {flight_id}...", flush=True)
+                
                 old_lat = active_flight.data[0].get('last_lat')
                 old_lon = active_flight.data[0].get('last_lon')
+                
                 supabase.table("flight_history").update({
                     "end_time": "now()",
                     "destination_airport": f"{old_lat}, {old_lon} (Last Seen)"
                 }).eq("id", flight_id).execute()
+                
                 print("🛑 Safety-close complete.", flush=True)
             else:
                 print("⏳ Still waiting for signal to return or 30m timer to expire.", flush=True)

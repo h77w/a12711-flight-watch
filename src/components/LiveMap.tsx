@@ -41,27 +41,16 @@ export function LiveMap() {
           "opensky-proxy"
         );
         if (fnError) throw fnError;
-
-        const s = data?.state as AircraftState | null;
-        if (!s) {
-          // Fallback simulated position so UI still demonstrates behavior
-          if (!cancelled)
-            setState({
-              lat: 36.5 + Math.random() * 2,
-              lon: -140 + Math.random() * 5,
-              heading: 270,
-              velocity: 240,
-              altitude: 11000,
-              callsign: "A12711",
-              squawk: Math.random() > 0.85 ? "7700" : "1200",
-              onGround: false,
-            });
-        } else if (!cancelled) {
+        const s = (data?.state as AircraftState | null) ?? null;
+        if (!cancelled) {
           setState(s);
+          setError(null);
         }
-        if (!cancelled) setError(null);
       } catch (e) {
-        if (!cancelled) setError((e as Error).message);
+        if (!cancelled) {
+          setState(null);
+          setError((e as Error).message);
+        }
       } finally {
         if (!cancelled) {
           setLoading(false);

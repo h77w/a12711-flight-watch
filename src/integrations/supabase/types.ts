@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      flight_history: {
+        Row: {
+          aircraft_id: string
+          created_at: string
+          destination: string
+          destination_lat: number
+          destination_lon: number
+          flight_date: string
+          id: string
+          is_diversion: boolean
+          is_emergency: boolean
+          origin: string
+          origin_lat: number
+          origin_lon: number
+        }
+        Insert: {
+          aircraft_id?: string
+          created_at?: string
+          destination: string
+          destination_lat: number
+          destination_lon: number
+          flight_date?: string
+          id?: string
+          is_diversion?: boolean
+          is_emergency?: boolean
+          origin: string
+          origin_lat: number
+          origin_lon: number
+        }
+        Update: {
+          aircraft_id?: string
+          created_at?: string
+          destination?: string
+          destination_lat?: number
+          destination_lon?: number
+          flight_date?: string
+          id?: string
+          is_diversion?: boolean
+          is_emergency?: boolean
+          origin?: string
+          origin_lat?: number
+          origin_lon?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

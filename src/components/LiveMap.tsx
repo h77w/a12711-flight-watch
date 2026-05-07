@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
 import { aircraftIcon } from "@/lib/map-utils";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";

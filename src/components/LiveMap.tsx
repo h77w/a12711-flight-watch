@@ -98,15 +98,10 @@ export function LiveMap() {
         </div>
         {loading && !state && <div>Acquiring signal…</div>}
         {error && <div className="text-destructive">{error}</div>}
-        {state && (
-          <div className="font-mono space-y-0.5">
-            <Row label="CALL" value={state.callsign || "—"} />
-            <Row label="LAT" value={state.lat?.toFixed(4)} />
-            <Row label="LON" value={state.lon?.toFixed(4)} />
-            <Row label="ALT" value={`${Math.round(state.altitude)} m`} />
-            <Row label="VEL" value={`${Math.round(state.velocity)} m/s`} />
-            <Row label="HDG" value={`${Math.round(state.heading)}°`} />
-            <Row label="SQK" value={state.squawk || "—"} highlight={emergency} />
+        {!loading && !state && !error && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground" />
+            <span className="uppercase tracking-widest text-[10px]">Not currently flying</span>
           </div>
         )}
       </div>
@@ -116,7 +111,9 @@ export function LiveMap() {
         zoom={4}
         className="h-full w-full"
         scrollWheelZoom
+        zoomControl={false}
       >
+        <ZoomControl position="bottomleft" />
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -139,6 +136,7 @@ export function LiveMap() {
           </>
         )}
       </MapContainer>
+
     </div>
   );
 }

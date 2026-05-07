@@ -35,11 +35,11 @@ def check_flight():
             data = response.json()
             if data.get('states'):
                 state_data = data['states'][0]
-                print("📡 Step 4: Plane found in the air or taxiing.")
+                print("📡 Step 4: Plane data retrieved successfully.")
             else:
                 print("📡 Step 4: Plane is currently invisible (offline).")
     except Exception as e:
-        print(f"⌛ Step 4: Connection issue: {e}")
+        print(f"⌛ Step 4: Request failed/timed out: {e}")
 
     print("🧠 Step 5: Checking Supabase for any open flights...")
     active_flight = supabase.table("flight_history").select("*").is_("end_time", "null").execute()
@@ -47,13 +47,16 @@ def check_flight():
     print(f"🧠 Step 6: Active flight in DB? {'Yes' if has_active_flight else 'No'}")
 
     if state_data:
+        # Extract Callsign (Index 1) and strip spaces
+        callsign = state_data[1].strip() if state_data[1] else "N/A"
         is_on_ground = state_data[8]
         lat, lon = state_data[6], state_data[5]
 
         if not is_on_ground and not has_active_flight:
-            print("🚀 ACTION: Takeoff! Creating new flight record.")
+            print(f"🚀 ACTION: Takeoff detected! Callsign: {callsign}")
             supabase.table("flight_history").insert({
                 "icao_address": HEX_CODE,
+                "callsign": callsign,
                 "start_time": "now()",
                 "last_seen": "now()",
                 "last_lat": lat,
@@ -62,16 +65,17 @@ def check_flight():
             }).execute()
         
         elif not is_on_ground and has_active_flight:
-            print(f"✅ ACTION: Cruising. Saving breadcrumb at ({lat}, {lon}).")
+            print(f"✅ ACTION: Cruising ({callsign}). Saving breadcrumb at ({lat}, {lon}).")
             flight_id = active_flight.data[0]['id']
             supabase.table("flight_history").update({
+                "callsign": callsign,
                 "last_seen": "now()",
                 "last_lat": lat,
                 "last_lon": lon
             }).eq("id", flight_id).execute()
 
         elif is_on_ground and has_active_flight:
-            print("🛬 ACTION: Landing. Closing flight record.")
+            print(f"🛬 ACTION: Landing confirmed for {callsign}. Closing record.")
             flight_id = active_flight.data[0]['id']
             supabase.table("flight_history").update({
                 "end_time": "now()",
@@ -79,6 +83,7 @@ def check_flight():
             }).eq("id", flight_id).execute()
     
     else:
+        # THE SAFETY NET: If the plane is GONE
         if has_active_flight:
             last_seen_str = active_flight.data[0].get('last_seen') or active_flight.data[0]['start_time']
             last_seen_dt = datetime.fromisoformat(last_seen_str.replace('Z', '+00:00'))
@@ -86,7 +91,7 @@ def check_flight():
             print(f"☁️ Step 7: Signal gap is {signal_gap.seconds // 60} minutes.")
 
             if signal_gap > timedelta(minutes=30):
-                print("🏁 ACTION: Auto-closing flight using last breadcrumb.")
+                print("🏁 ACTION: Auto-closing flight using last saved breadcrumb.")
                 flight_id = active_flight.data[0]['id']
                 old_lat = active_flight.data[0].get('last_lat', "Unknown")
                 old_lon = active_flight.data[0].get('last_lon', "Unknown")
@@ -95,7 +100,7 @@ def check_flight():
                     "destination_airport": f"{old_lat}, {old_lon} (Last Seen)"
                 }).eq("id", flight_id).execute()
             else:
-                print("⏳ Step 7: Gap is small. Keeping flight open for now.")
+                print("⏳ Step 7: Gap is small. Keeping flight open.")
         else:
             print("💤 Step 7: Plane is offline and no flights are open. Resting.")
 

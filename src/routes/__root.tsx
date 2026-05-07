@@ -73,14 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "N17328 Tracker" },
+      { name: "description", content: "A12711 Flight Watch tracks aircraft A12711 live and displays historical flight data." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "N17328 Tracker" },
+      { property: "og:description", content: "A12711 Flight Watch tracks aircraft A12711 live and displays historical flight data." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "N17328 Tracker" },
+      { name: "twitter:description", content: "A12711 Flight Watch tracks aircraft A12711 live and displays historical flight data." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7e18d9b4-0d05-4715-a6f3-632f5f5ac9be/id-preview-5cc1fd7c--f158ad67-1132-4102-8799-462976009cc0.lovable.app-1778124607862.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7e18d9b4-0d05-4715-a6f3-632f5f5ac9be/id-preview-5cc1fd7c--f158ad67-1132-4102-8799-462976009cc0.lovable.app-1778124607862.png" },
     ],
     links: [
       {

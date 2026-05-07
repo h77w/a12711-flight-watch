@@ -17,13 +17,13 @@ function LivePage() {
     <div className="h-full w-full flex flex-col">
       <header className="px-6 py-4 border-b border-border bg-card flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold uppercase tracking-[0.25em]">Live Operations</h1>
+          <h1 className="text-lg font-bold uppercase tracking-[0.25em]">Aircraft A12711 - B38M</h1>
           <p className="text-xs text-muted-foreground uppercase tracking-widest">
-            Aircraft A12711 · OpenSky Network
+            OpenSky Network
           </p>
         </div>
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-          Refresh · 15s
+          Refresh · 60s
         </div>
       </header>
       <div className="flex-1 relative scan-line">

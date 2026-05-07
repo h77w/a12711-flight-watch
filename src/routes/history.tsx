@@ -42,6 +42,11 @@ function HistoryPage() {
         </header>
         <div className="flex-1 overflow-y-auto divide-y divide-border">
           {isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
+          {!isLoading && (!flights || flights.length === 0) && (
+            <div className="p-6 text-sm text-muted-foreground uppercase tracking-widest">
+              No flight history available.
+            </div>
+          )}
           {flights?.map((f) => {
             const flagged = f.is_emergency || f.is_diversion;
             return (

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
 import { aircraftIcon } from "@/lib/map-utils";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,27 +41,16 @@ export function LiveMap() {
           "opensky-proxy"
         );
         if (fnError) throw fnError;
-
-        const s = data?.state as AircraftState | null;
-        if (!s) {
-          // Fallback simulated position so UI still demonstrates behavior
-          if (!cancelled)
-            setState({
-              lat: 36.5 + Math.random() * 2,
-              lon: -140 + Math.random() * 5,
-              heading: 270,
-              velocity: 240,
-              altitude: 11000,
-              callsign: "A12711",
-              squawk: Math.random() > 0.85 ? "7700" : "1200",
-              onGround: false,
-            });
-        } else if (!cancelled) {
+        const s = (data?.state as AircraftState | null) ?? null;
+        if (!cancelled) {
           setState(s);
+          setError(null);
         }
-        if (!cancelled) setError(null);
       } catch (e) {
-        if (!cancelled) setError((e as Error).message);
+        if (!cancelled) {
+          setState(null);
+          setError((e as Error).message);
+        }
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -109,15 +98,10 @@ export function LiveMap() {
         </div>
         {loading && !state && <div>Acquiring signal…</div>}
         {error && <div className="text-destructive">{error}</div>}
-        {state && (
-          <div className="font-mono space-y-0.5">
-            <Row label="CALL" value={state.callsign || "—"} />
-            <Row label="LAT" value={state.lat?.toFixed(4)} />
-            <Row label="LON" value={state.lon?.toFixed(4)} />
-            <Row label="ALT" value={`${Math.round(state.altitude)} m`} />
-            <Row label="VEL" value={`${Math.round(state.velocity)} m/s`} />
-            <Row label="HDG" value={`${Math.round(state.heading)}°`} />
-            <Row label="SQK" value={state.squawk || "—"} highlight={emergency} />
+        {!loading && !state && !error && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground" />
+            <span className="uppercase tracking-widest text-[10px]">Not currently flying</span>
           </div>
         )}
       </div>
@@ -127,7 +111,9 @@ export function LiveMap() {
         zoom={4}
         className="h-full w-full"
         scrollWheelZoom
+        zoomControl={false}
       >
+        <ZoomControl position="bottomleft" />
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -150,6 +136,7 @@ export function LiveMap() {
           </>
         )}
       </MapContainer>
+
     </div>
   );
 }

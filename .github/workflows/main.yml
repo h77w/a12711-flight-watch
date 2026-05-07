@@ -1,20 +1,23 @@
 name: Aircraft Tracker Robot
 on:
   schedule:
-    - cron: '*/10 * * * *' # Runs every 10 minutes
-  workflow_dispatch: # Allows you to run it manually to test
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
 
 jobs:
   track:
     runs-on: ubuntu-latest
+    env:
+      # This line clears that Node.js 20 warning for you
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11' # Upgraded to a more modern Python
       - name: Install dependencies
-        run: pip install requests supabase
+        run: pip install requests supabase postgrest # Added postgrest just in case
       - name: Run Tracker
         run: python tracker.py
         env:

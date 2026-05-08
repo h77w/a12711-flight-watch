@@ -21,7 +21,7 @@ export function useFlightHistory() {
     load();
 
     const channel = supabase
-      .channel("flight_history_changes")
+      .channel(`flight_history_changes_${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "flight_history" },

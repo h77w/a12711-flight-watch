@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Radio, History, Plane } from "lucide-react";
+import { Radio, Map, List, Plane } from "lucide-react";
 
 const items = [
-  { title: "Live", url: "/", icon: Radio },
-  { title: "History", url: "/history", icon: History },
-];
+  { title: "Live Map", url: "/", icon: Radio },
+  { title: "History Map", url: "/history", icon: Map },
+  { title: "Past Flights", url: "/flights", icon: List },
+] as const;
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

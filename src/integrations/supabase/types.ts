@@ -16,46 +16,49 @@ export type Database = {
     Tables: {
       flight_history: {
         Row: {
-          aircraft_id: string
+          callsign: string | null
           created_at: string
-          destination: string
-          destination_lat: number
-          destination_lon: number
-          flight_date: string
+          destination_airport: string | null
+          end_time: string | null
+          icao_address: string
           id: string
           is_diversion: boolean
           is_emergency: boolean
-          origin: string
-          origin_lat: number
-          origin_lon: number
+          last_lat: number | null
+          last_lon: number | null
+          last_seen: string | null
+          origin_airport: string | null
+          start_time: string
         }
         Insert: {
-          aircraft_id?: string
+          callsign?: string | null
           created_at?: string
-          destination: string
-          destination_lat: number
-          destination_lon: number
-          flight_date?: string
+          destination_airport?: string | null
+          end_time?: string | null
+          icao_address?: string
           id?: string
           is_diversion?: boolean
           is_emergency?: boolean
-          origin: string
-          origin_lat: number
-          origin_lon: number
+          last_lat?: number | null
+          last_lon?: number | null
+          last_seen?: string | null
+          origin_airport?: string | null
+          start_time?: string
         }
         Update: {
-          aircraft_id?: string
+          callsign?: string | null
           created_at?: string
-          destination?: string
-          destination_lat?: number
-          destination_lon?: number
-          flight_date?: string
+          destination_airport?: string | null
+          end_time?: string | null
+          icao_address?: string
           id?: string
           is_diversion?: boolean
           is_emergency?: boolean
-          origin?: string
-          origin_lat?: number
-          origin_lon?: number
+          last_lat?: number | null
+          last_lon?: number | null
+          last_seen?: string | null
+          origin_airport?: string | null
+          start_time?: string
         }
         Relationships: []
       }

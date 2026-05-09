@@ -1,14 +1,17 @@
 import L from "leaflet";
 import aircraftPng from "@/assets/aircraft.png";
 
+const AIRCRAFT_W = 72;
+const AIRCRAFT_H = Math.round(72 * (1536 / 1549)); // preserve original aspect ratio
+
 export const aircraftIcon = (heading = 0, active = false) =>
   L.divIcon({
     className: "",
-    iconSize: [56, 56],
-    iconAnchor: [28, 28],
+    iconSize: [AIRCRAFT_W, AIRCRAFT_H],
+    iconAnchor: [AIRCRAFT_W / 2, AIRCRAFT_H / 2],
     html: `
-      <div class="${active ? "pulse-active" : ""}" style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;">
-        <img src="${aircraftPng}" style="width:48px;height:48px;transform:rotate(${heading}deg);" />
+      <div class="${active ? "pulse-active" : ""}" style="width:${AIRCRAFT_W}px;height:${AIRCRAFT_H}px;display:flex;align-items:center;justify-content:center;">
+        <img src="${aircraftPng}" style="width:100%;height:100%;object-fit:contain;transform:rotate(${heading}deg);" />
       </div>
     `,
   });

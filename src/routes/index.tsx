@@ -18,10 +18,7 @@ function LivePage() {
     <div className="h-full w-full flex flex-col">
       <header className="px-6 py-4 border-b border-border bg-card flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold uppercase tracking-[0.25em]">Aircraft A12711 - B38M</h1>
-          <p className="text-xs text-muted-foreground uppercase tracking-widest">
-            Supabase Realtime
-          </p>
+          <h1 className="text-lg font-bold uppercase tracking-[0.25em]">Aircraft Reg N17328 - B38M</h1>
         </div>
         <StatusBadge />
       </header>

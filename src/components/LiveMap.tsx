@@ -45,7 +45,7 @@ export function LiveMap() {
         {position && (
           <>
             <Recenter lat={position[0]} lon={position[1]} />
-            <Marker position={position} icon={aircraftIcon(0, false)}>
+            <Marker position={position} icon={aircraftIcon(0, isActive)}>
               <Popup>
                 <strong>{flight?.callsign ?? "A12711"}</strong>
                 <br />

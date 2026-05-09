@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, Tooltip } from "react-leaflet";
 import { greatCircle } from "@/lib/map-utils";
 import { parseLatLon, type Flight } from "@/lib/flight-utils";
 
@@ -12,12 +12,6 @@ export function HistoryMap({ flights }: { flights: Flight[] }) {
       return { flight: f, origin: o, destination: d };
     })
     .filter((s): s is { flight: Flight; origin: [number, number]; destination: [number, number] } => !!s);
-
-  const airports = new Map<string, [number, number]>();
-  for (const s of segments) {
-    airports.set(`${s.origin[0]},${s.origin[1]}`, s.origin);
-    airports.set(`${s.destination[0]},${s.destination[1]}`, s.destination);
-  }
 
   return (
     <MapContainer center={[25, -60]} zoom={3} className="h-full w-full" scrollWheelZoom>
@@ -39,19 +33,6 @@ export function HistoryMap({ flights }: { flights: Flight[] }) {
           </Polyline>
         );
       })}
-      {Array.from(airports.values()).map(([lat, lon], i) => (
-        <CircleMarker
-          key={`${lat},${lon},${i}`}
-          center={[lat, lon]}
-          radius={4}
-          pathOptions={{
-            color: "oklch(0.35 0.08 145)",
-            fillColor: "oklch(0.99 0 0)",
-            fillOpacity: 1,
-            weight: 2,
-          }}
-        />
-      ))}
     </MapContainer>
   );
 }

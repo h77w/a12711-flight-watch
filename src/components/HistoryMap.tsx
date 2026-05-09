@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, Tooltip } from "react-leaflet";
 import { greatCircle } from "@/lib/map-utils";
 import { parseLatLon, type Flight } from "@/lib/flight-utils";
 

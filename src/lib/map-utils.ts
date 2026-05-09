@@ -1,15 +1,14 @@
 import L from "leaflet";
+import aircraftPng from "@/assets/aircraft.png";
 
-export const aircraftIcon = (heading = 0, emergency = false) =>
+export const aircraftIcon = (heading = 0, active = false) =>
   L.divIcon({
     className: "",
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+    iconSize: [56, 56],
+    iconAnchor: [28, 28],
     html: `
-      <div class="${emergency ? "pulse-emergency" : ""}" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
-        <svg viewBox="0 0 24 24" width="32" height="32" style="transform: rotate(${heading}deg); color: ${emergency ? "oklch(0.58 0.24 27)" : "oklch(0.35 0.08 145)"};" fill="currentColor">
-          <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/>
-        </svg>
+      <div class="${active ? "pulse-active" : ""}" style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;">
+        <img src="${aircraftPng}" style="width:48px;height:48px;transform:rotate(${heading}deg);" />
       </div>
     `,
   });
@@ -42,7 +41,7 @@ export function greatCircle(
     const A = Math.sin((1 - f) * d) / Math.sin(d);
     const B = Math.sin(f * d) / Math.sin(d);
     const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
-    const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+    const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
     const z = A * Math.sin(lat1) + B * Math.sin(lat2);
     const lat = Math.atan2(z, Math.sqrt(x * x + y * y));
     const lon = Math.atan2(y, x);

@@ -56,16 +56,22 @@ def check_flight():
         lat, lon = state_data[6], state_data[5]
 
         if not is_on_ground and not has_active_flight:
-            print(f"🚀 ACTION: Takeoff! Callsign: {db_callsign}", flush=True)
-            supabase.table("flight_history").insert({
-                "icao_address": HEX_CODE,
-                "callsign": db_callsign,
-                "start_time": "now()",
-                "last_seen": "now()",
-                "last_lat": lat,
-                "last_lon": lon,
-                "origin_airport": f"{lat}, {lon}"
-            }).execute()
+            # 🛡️ THE VALIDATION SHIELD
+            # Only start the flight if we have both coordinates and a real callsign
+            if lat is not None and lon is not None and new_callsign is not None:
+                print(f"🚀 ACTION: Takeoff! Callsign: {db_callsign}", flush=True)
+                supabase.table("flight_history").insert({
+                    "icao_address": HEX_CODE,
+                    "callsign": db_callsign,
+                    "start_time": "now()",
+                    "last_seen": "now()",
+                    "last_lat": lat,
+                    "last_lon": lon,
+                    "origin_airport": f"{lat}, {lon}"
+                }).execute()
+            else:
+                # Log that we saw the plane but the data wasn't ready yet
+                print(f"⚠️ SIGNAL WEAK: Plane airborne but missing GPS or Callsign. Waiting for next ping...", flush=True)
         
         elif not is_on_ground and has_active_flight:
             print(f"✅ ACTION: Cruising ({db_callsign}). Saving breadcrumb.", flush=True)

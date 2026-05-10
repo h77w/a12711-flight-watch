@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, ZoomControl } from "react-leaflet";
-import { aircraftIcon, greatCircle } from "@/lib/map-utils";
+import { aircraftIcon, greatCircle, bearing } from "@/lib/map-utils";
 import { useCurrentFlight } from "@/hooks/useFlightHistory";
 import { parseLatLon } from "@/lib/flight-utils";
 
@@ -42,28 +42,28 @@ export function LiveMap() {
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {position && (
-          <>
-            <Recenter lat={position[0]} lon={position[1]} />
-            {isActive && flight && (() => {
-              const origin = parseLatLon(flight.origin_airport);
-              if (!origin) return null;
-              return (
+        {position && (() => {
+          const origin = isActive && flight ? parseLatLon(flight.origin_airport) : null;
+          const heading = isActive && origin ? bearing(origin, position) : 0;
+          return (
+            <>
+              <Recenter lat={position[0]} lon={position[1]} />
+              {isActive && origin && (
                 <Polyline
                   positions={greatCircle(origin, position, 80)}
                   pathOptions={{ color: "oklch(0.45 0.12 145)", weight: 2.5, opacity: 0.8 }}
                 />
-              );
-            })()}
-            <Marker position={position} icon={aircraftIcon(0, isActive)}>
-              <Popup>
-                <strong>{flight?.callsign ?? "A12711"}</strong>
-                <br />
-                {isActive ? "In flight" : "On the ground"}
-              </Popup>
-            </Marker>
-          </>
-        )}
+              )}
+              <Marker position={position} icon={aircraftIcon(heading, isActive)}>
+                <Popup>
+                  <strong>{flight?.callsign ?? "A12711"}</strong>
+                  <br />
+                  {isActive ? "In flight" : "On the ground"}
+                </Popup>
+              </Marker>
+            </>
+          );
+        })()}
       </MapContainer>
     </div>
   );

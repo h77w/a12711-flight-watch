@@ -52,3 +52,14 @@ export function greatCircle(
   }
   return points;
 }
+
+/** Initial bearing from start to end, in degrees (0 = north, clockwise). */
+export function bearing(start: [number, number], end: [number, number]): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const toDeg = (r: number) => (r * 180) / Math.PI;
+  const [lat1, lat2] = [toRad(start[0]), toRad(end[0])];
+  const dLon = toRad(end[1] - start[1]);
+  const y = Math.sin(dLon) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}

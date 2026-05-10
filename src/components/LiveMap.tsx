@@ -51,7 +51,7 @@ export function LiveMap() {
               {isActive && origin && (
                 <Polyline
                   positions={greatCircle(origin, position, 80)}
-                  pathOptions={{ color: "oklch(0.45 0.12 145)", weight: 2.5, opacity: 0.8 }}
+                  pathOptions={{ color: "#005DAA", weight: 2.5, opacity: 0.8 }}
                 />
               )}
               <Marker position={position} icon={aircraftIcon(heading, isActive)}>

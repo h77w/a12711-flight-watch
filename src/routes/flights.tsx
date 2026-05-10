@@ -29,7 +29,7 @@ function FlightsPage() {
         </div>
         <StatusBadge />
       </header>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-white">
         {!flights && <div className="p-6 text-sm text-muted-foreground">Loading…</div>}
         {error && <div className="p-6 text-sm text-destructive">{error}</div>}
         {flights && completed.length === 0 && (

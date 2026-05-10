@@ -25,7 +25,7 @@ export function HistoryMap({ flights }: { flights: Flight[] }) {
           <Polyline
             key={s.flight.id + i}
             positions={positions}
-            pathOptions={{ color: "oklch(0.45 0.12 145)", weight: 2.5, opacity: 0.8 }}
+            pathOptions={{ color: "#005DAA", weight: 2.5, opacity: 0.8 }}
           >
             <Tooltip sticky>
               <span className="font-mono text-xs">{s.flight.callsign ?? "Flight"}</span>

@@ -24,11 +24,9 @@ export function StatusBadge() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2 px-3 py-1.5 border border-border bg-card text-[11px] uppercase tracking-widest">
-        <span
-          className={`inline-block w-2 h-2 rounded-full ${
-            isActive ? "bg-primary animate-pulse" : "bg-muted-foreground"
-          }`}
-        />
+        {isActive && (
+          <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+        )}
         <span>
           {isActive
             ? `Flying as ${flight?.callsign ?? "—"}`

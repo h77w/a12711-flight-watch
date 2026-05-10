@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
-import { aircraftIcon } from "@/lib/map-utils";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, ZoomControl } from "react-leaflet";
+import { aircraftIcon, greatCircle } from "@/lib/map-utils";
 import { useCurrentFlight } from "@/hooks/useFlightHistory";
 import { parseLatLon } from "@/lib/flight-utils";
 
@@ -45,6 +45,16 @@ export function LiveMap() {
         {position && (
           <>
             <Recenter lat={position[0]} lon={position[1]} />
+            {isActive && flight && (() => {
+              const origin = parseLatLon(flight.origin_airport);
+              if (!origin) return null;
+              return (
+                <Polyline
+                  positions={greatCircle(origin, position, 80)}
+                  pathOptions={{ color: "oklch(0.45 0.12 145)", weight: 2.5, opacity: 0.8 }}
+                />
+              );
+            })()}
             <Marker position={position} icon={aircraftIcon(0, isActive)}>
               <Popup>
                 <strong>{flight?.callsign ?? "A12711"}</strong>
